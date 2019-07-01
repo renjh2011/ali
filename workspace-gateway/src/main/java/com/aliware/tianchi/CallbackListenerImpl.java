@@ -1,5 +1,7 @@
 package com.aliware.tianchi;
 
+import org.apache.dubbo.common.logger.Logger;
+import org.apache.dubbo.common.logger.LoggerFactory;
 import org.apache.dubbo.rpc.listener.CallbackListener;
 
 /**
@@ -11,9 +13,10 @@ import org.apache.dubbo.rpc.listener.CallbackListener;
  *
  */
 public class CallbackListenerImpl implements CallbackListener {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(CallbackListenerImpl.class);
     @Override
     public void receiveServerMsg(String msg) {
+        LOGGER.info(msg);
     }
 
 }
