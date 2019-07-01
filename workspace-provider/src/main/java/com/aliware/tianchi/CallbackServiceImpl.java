@@ -1,13 +1,14 @@
 package com.aliware.tianchi;
 
+import org.apache.dubbo.common.Constants;
+import org.apache.dubbo.common.extension.ExtensionLoader;
+import org.apache.dubbo.common.store.DataStore;
 import org.apache.dubbo.rpc.listener.CallbackListener;
 import org.apache.dubbo.rpc.service.CallbackService;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author daofeng.xjf
@@ -25,7 +26,17 @@ public class CallbackServiceImpl implements CallbackService {
                 if (!listeners.isEmpty()) {
                     for (Map.Entry<String, CallbackListener> entry : listeners.entrySet()) {
                         try {
-                            entry.getValue().receiveServerMsg(System.getProperty("quota") + " " + new Date().toString());
+                            DataStore dataStore = ExtensionLoader.getExtensionLoader(DataStore.class).getDefaultExtension();
+                            Map<String, Object> map = dataStore.get(Constants.EXECUTOR_SERVICE_COMPONENT_KEY);
+                            Set<Map.Entry<String, Object>> set = map.entrySet();
+                            String s = null;
+                            for(Map.Entry<String, Object> entry1 : set){
+                                if(entry1.getValue() instanceof ThreadPoolExecutor){
+                                    ThreadPoolExecutor executorService = (ThreadPoolExecutor) entry1.getValue();
+                                    s=entry1.getKey()+"---"+executorService.getActiveCount()+"---"+executorService.getMaximumPoolSize();
+                                }
+                            }
+                            entry.getValue().receiveServerMsg(s);
                         } catch (Throwable t1) {
                             listeners.remove(entry.getKey());
                         }

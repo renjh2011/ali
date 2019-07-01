@@ -19,16 +19,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Activate(group = Constants.PROVIDER)
 public class TestServerFilter implements Filter {
-    private static AtomicInteger count =  new AtomicInteger(0);
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
-        if(count.get()>50){
-            throw new RpcException("reject");
-        }
         try{
-            count.incrementAndGet();
             Result result = invoker.invoke(invocation);
-            count.decrementAndGet();
             return result;
         }catch (Exception e){
             throw e;
