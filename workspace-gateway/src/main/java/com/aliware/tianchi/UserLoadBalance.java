@@ -21,6 +21,27 @@ public class UserLoadBalance implements LoadBalance {
 
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
+        Invoker<T> invoker=null;
+        /*
+        服务器信息返回 使用负载萨算法
+         */
+        if(!CallbackListenerImpl.TOTAL_MAP.isEmpty()){
+            invoker = smoothSelect(invokers, url, invocation);
+        }
+        /*
+        当服务器信息未返回时 使用随机
+         */
+        invoker = randomSelect(invokers, url, invocation);
+
+        return invoker;
+
+    }
+
+    private <T> Invoker<T> smoothSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
+        return null;
+    }
+
+    private <T> Invoker<T> randomSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
         return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
     }
 }
