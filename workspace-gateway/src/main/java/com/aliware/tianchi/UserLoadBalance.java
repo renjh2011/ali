@@ -18,30 +18,42 @@ import java.util.concurrent.ThreadLocalRandom;
  * 选手需要基于此类实现自己的负载均衡算法
  */
 public class UserLoadBalance implements LoadBalance {
-
+    private static volatile boolean isInit =false;
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
         Invoker<T> invoker=null;
         /*
         服务器信息返回 使用负载萨算法
          */
-        if(!CallbackListenerImpl.TOTAL_MAP.isEmpty()){
-            invoker = smoothSelect(invokers, url, invocation);
-        }
-        /*
-        当服务器信息未返回时 使用随机
-         */
-        invoker = randomSelect(invokers, url, invocation);
+        invoker = smoothSelect(invokers);
 
         return invoker;
 
     }
 
-    private <T> Invoker<T> smoothSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
-        return null;
-    }
-
-    private <T> Invoker<T> randomSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
+    private <T> Invoker<T> smoothSelect(List<Invoker<T>> invokers) {
+        if(invokers.size()>CallbackListenerImpl.TOTAL_MAP.size()){
+            return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
+        }else if(invokers.size()==CallbackListenerImpl.TOTAL_MAP.size() && !isInit){
+            synchronized (UserLoadBalance.class) {
+                CustomRobin.init(CallbackListenerImpl.TOTAL_MAP);
+                isInit=true;
+            }
+        }
+        Integer port = CustomRobin.getServer();
+        System.out.println("---port---------"+port);
+        if(port==null){
+            return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
+        }
+        for(Invoker<T> invoker : invokers){
+            if(invoker.getUrl().getPort()==port){
+                return invoker;
+            }
+        }
         return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
     }
+
+//    private <T> Invoker<T> randomSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
+//        return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
+//    }
 }

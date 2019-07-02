@@ -29,4 +29,12 @@ public class ProviderStatus {
     public void setTotal(int total) {
         this.total = total;
     }
+
+    public long getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(long period) {
+        this.period = period;
+    }
 }

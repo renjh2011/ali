@@ -17,7 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CallbackListenerImpl implements CallbackListener {
     public static Map<Integer,Integer> TOTAL_MAP =  new ConcurrentHashMap<>(3);
-    public static Map<Integer,Integer> ACTIVE_MAP =  new ConcurrentHashMap<>(3);
+//    public static Map<Integer,Integer> ACTIVE_MAP =  new ConcurrentHashMap<>(3);
+//    public volatile static Map<Integer,ProviderStatus> STATUS_MAP =  new ConcurrentHashMap<>(3);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CallbackListenerImpl.class);
     @Override
@@ -32,10 +33,18 @@ public class CallbackListenerImpl implements CallbackListener {
                 int activeCount = Integer.parseInt(status[1]);
                 //总数
                 int total = Integer.parseInt(status[2]);
-                if(TOTAL_MAP.isEmpty()){
+//                ProviderStatus pStatus =  new ProviderStatus();
+//                pStatus.setActiveCount(activeCount);
+//                pStatus.setPort(port);
+//                pStatus.setTotal(total);
+//                pStatus.setPeriod(System.currentTimeMillis());
+//                STATUS_MAP.put(port,pStatus);
+                TOTAL_MAP.put(port,total);
+//                CustomRobin.init(TOTAL_MAP);
+                /*if(TOTAL_MAP.isEmpty()){
                     TOTAL_MAP.put(port,total);
                 }
-                ACTIVE_MAP.put(port,activeCount);
+                ACTIVE_MAP.put(port,activeCount);*/
             }
         }
     }
