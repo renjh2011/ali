@@ -21,13 +21,7 @@ public class UserLoadBalance implements LoadBalance {
     private static volatile boolean isInit =false;
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
-        Invoker<T> invoker=null;
-        /*
-        服务器信息返回 使用负载萨算法
-         */
-        invoker = smoothSelect(invokers);
-        return invoker;
-
+        return smoothSelect(invokers);
     }
 
     private <T> Invoker<T> smoothSelect(List<Invoker<T>> invokers) {
