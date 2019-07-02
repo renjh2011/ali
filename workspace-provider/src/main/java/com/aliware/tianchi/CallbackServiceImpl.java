@@ -18,6 +18,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * 用户可以基于此服务，实现服务端向客户端动态推送的功能
  */
 public class CallbackServiceImpl implements CallbackService {
+    public static volatile int TOTAL = -1;
 
     public CallbackServiceImpl() {
         timer.schedule(new TimerTask() {
@@ -29,14 +30,19 @@ public class CallbackServiceImpl implements CallbackService {
                             DataStore dataStore = ExtensionLoader.getExtensionLoader(DataStore.class).getDefaultExtension();
                             Map<String, Object> map = dataStore.get(Constants.EXECUTOR_SERVICE_COMPONENT_KEY);
                             Set<Map.Entry<String, Object>> set = map.entrySet();
-                            String s = null;
+                            //线程池状态
+                            String status = null;
                             for(Map.Entry<String, Object> entry1 : set){
                                 if(entry1.getValue() instanceof ThreadPoolExecutor){
                                     ThreadPoolExecutor executorService = (ThreadPoolExecutor) entry1.getValue();
-                                    s=entry1.getKey()+"---"+executorService.getActiveCount()+"---"+executorService.getMaximumPoolSize();
+                                    TOTAL=executorService.getMaximumPoolSize();
+                                    status=entry1.getKey()+","+executorService.getActiveCount()+","+executorService.getMaximumPoolSize();
+                                    break;
                                 }
                             }
-                            entry.getValue().receiveServerMsg(s);
+                            if(status!=null) {
+                                entry.getValue().receiveServerMsg(status);
+                            }
                         } catch (Throwable t1) {
                             listeners.remove(entry.getKey());
                         }
