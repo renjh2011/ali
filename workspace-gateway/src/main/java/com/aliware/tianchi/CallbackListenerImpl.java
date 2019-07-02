@@ -1,7 +1,5 @@
 package com.aliware.tianchi;
 
-import org.apache.dubbo.common.logger.Logger;
-import org.apache.dubbo.common.logger.LoggerFactory;
 import org.apache.dubbo.rpc.listener.CallbackListener;
 
 import java.util.Map;
@@ -20,7 +18,7 @@ public class CallbackListenerImpl implements CallbackListener {
 //    public static Map<Integer,Integer> ACTIVE_MAP =  new ConcurrentHashMap<>(3);
 //    public volatile static Map<Integer,ProviderStatus> STATUS_MAP =  new ConcurrentHashMap<>(3);
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CallbackListenerImpl.class);
+//    private static final Logger LOGGER = LoggerFactory.getLogger(CallbackListenerImpl.class);
     @Override
     public void receiveServerMsg(String msg) {
         if(msg!=null && !msg.isEmpty()){

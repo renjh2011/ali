@@ -11,7 +11,6 @@ public class CustomRobin {
     private volatile static List<CustomWeight> customWeights = new ArrayList<>(3);
     public synchronized static void init(Map<Integer, Integer> newMap){
         if(orginalMap.size()!=newMap.size()){
-            System.out.println("newMap = [" + newMap + "]");
             orginalMap=newMap;
             Iterator<Map.Entry<Integer, Integer>> iterator = newMap.entrySet().iterator();
             while (iterator.hasNext()){

@@ -26,7 +26,6 @@ public class UserLoadBalance implements LoadBalance {
         服务器信息返回 使用负载萨算法
          */
         invoker = smoothSelect(invokers);
-
         return invoker;
 
     }
@@ -41,7 +40,6 @@ public class UserLoadBalance implements LoadBalance {
             }
         }
         Integer port = CustomRobin.getServer();
-        System.out.println("---port---------"+port);
         if(port==null){
             return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
         }
