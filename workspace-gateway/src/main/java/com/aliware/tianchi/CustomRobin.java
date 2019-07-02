@@ -1,24 +1,14 @@
 package com.aliware.tianchi;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
+
 
 public class CustomRobin {
-    private volatile static Map<Integer, Integer> orginalMap = new ConcurrentHashMap<>(3);
+//    private volatile static Map<Integer, Integer> orginalMap = new ConcurrentHashMap<>(3);
     private volatile static List<CustomWeight> customWeights = new ArrayList<>(3);
-    public synchronized static void init(Map<Integer, Integer> newMap){
-        if(orginalMap.size()!=newMap.size()){
-            orginalMap=newMap;
-            Iterator<Map.Entry<Integer, Integer>> iterator = newMap.entrySet().iterator();
-            while (iterator.hasNext()){
-                Map.Entry<Integer, Integer> entry = iterator.next();
-                CustomWeight customWeight = new CustomWeight(entry.getKey(),entry.getValue(),0);
-                customWeights.add(customWeight);
-            }
-        }
+    public static void init(Map<Integer, CustomWeight> newMap){
+        customWeights = new ArrayList<>(newMap.values());
+        Collections.sort(customWeights);
     }
 
     public static Integer getServer() {

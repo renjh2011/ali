@@ -1,9 +1,10 @@
 package com.aliware.tianchi;
 
-public class CustomWeight {
-    private Integer port;
-    private Integer weight;
-    private Integer currentWeight;
+
+public class CustomWeight implements Comparable<CustomWeight> {
+    private volatile Integer port;
+    private volatile Integer weight;
+    private volatile Integer currentWeight;
 
     public CustomWeight(Integer port, Integer weight, Integer currentWeight) {
         this.port = port;
@@ -33,5 +34,10 @@ public class CustomWeight {
 
     public void setCurrentWeight(Integer currentWeight) {
         this.currentWeight = currentWeight;
+    }
+
+    @Override
+    public int compareTo(CustomWeight o) {
+        return this.getWeight()-o.getWeight();
     }
 }

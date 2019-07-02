@@ -14,7 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  */
 public class CallbackListenerImpl implements CallbackListener {
-    public static Map<Integer,Integer> TOTAL_MAP =  new ConcurrentHashMap<>(3);
+//    public static Map<Integer,Integer> TOTAL_MAP =  new ConcurrentHashMap<>(3);
+    public static Map<Integer,CustomWeight> CUSTOM_WEIGHT_MAP =  new ConcurrentHashMap<>(3);
 //    public static Map<Integer,Integer> ACTIVE_MAP =  new ConcurrentHashMap<>(3);
 //    public volatile static Map<Integer,ProviderStatus> STATUS_MAP =  new ConcurrentHashMap<>(3);
 
@@ -37,7 +38,9 @@ public class CallbackListenerImpl implements CallbackListener {
 //                pStatus.setTotal(total);
 //                pStatus.setPeriod(System.currentTimeMillis());
 //                STATUS_MAP.put(port,pStatus);
-                TOTAL_MAP.put(port,total);
+                CustomWeight customWeight = new CustomWeight(port,total,0);
+                CUSTOM_WEIGHT_MAP.put(port,customWeight);
+//                TOTAL_MAP.put(port,total);
 //                CustomRobin.init(TOTAL_MAP);
                 /*if(TOTAL_MAP.isEmpty()){
                     TOTAL_MAP.put(port,total);

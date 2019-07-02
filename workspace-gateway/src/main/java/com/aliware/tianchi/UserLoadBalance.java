@@ -25,12 +25,12 @@ public class UserLoadBalance implements LoadBalance {
     }
 
     private <T> Invoker<T> smoothSelect(List<Invoker<T>> invokers) {
-        if(invokers.size()>CallbackListenerImpl.TOTAL_MAP.size()){
+        if(invokers.size()>CallbackListenerImpl.CUSTOM_WEIGHT_MAP.size()){
             return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
-        }else if(invokers.size()==CallbackListenerImpl.TOTAL_MAP.size() && !isInit){
+        }else if(invokers.size()==CallbackListenerImpl.CUSTOM_WEIGHT_MAP.size() && !isInit){
             synchronized (UserLoadBalance.class) {
-                CustomRobin.init(CallbackListenerImpl.TOTAL_MAP);
-                isInit=true;
+                CustomRobin.init(CallbackListenerImpl.CUSTOM_WEIGHT_MAP);
+                isInit = true;
             }
         }
         Integer port = CustomRobin.getServer();
