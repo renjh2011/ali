@@ -7,6 +7,7 @@ import org.apache.dubbo.rpc.RpcException;
 import org.apache.dubbo.rpc.RpcStatus;
 import org.apache.dubbo.rpc.cluster.LoadBalance;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -22,14 +23,25 @@ public class UserLoadBalance implements LoadBalance {
     private static volatile boolean isInit =false;
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
-        for(Invoker<T> invoker : invokers){
-            RpcStatus status = RpcStatus.getStatus(invoker.getUrl(), invocation.getMethodName());
-            System.out.println(status.getTotal()+"-----------"+status.getActive());
-        }
-        return smoothSelect(invokers);
+        Invoker<T> invoker =  smoothSelect(invokers);
+//        String ip = invoker.getUrl().getIp();
+//        int port = invoker.getUrl().getPort();
+//        ClientStatus clientStatus = ClientStatus.getStatus(ip,port);
+//        System.out.println("ip = "+ip +" port = "+port +" clientStatus = [" + clientStatus + "]");
+        return invoker;
     }
 
     private <T> Invoker<T> smoothSelect(List<Invoker<T>> invokers) {
+        for(Invoker<T> invoker : invokers){
+            String ip = invoker.getUrl().getIp();
+            int port = invoker.getUrl().getPort();
+            ClientStatus clientStatus = ClientStatus.getStatus(ip,port);
+            if(System.currentTimeMillis()-clientStatus.failedTime.get()<200 || clientStatus.rtt.get()>400){
+                CustomWeight customWeight = CallbackListenerImpl.CUSTOM_WEIGHT_MAP.get(port);
+                customWeight.setWeight(customWeight.getWeight()-50);
+                CustomRobin.init(CallbackListenerImpl.CUSTOM_WEIGHT_MAP);
+            }
+        }
         if(invokers.size()>CallbackListenerImpl.CUSTOM_WEIGHT_MAP.size()){
             return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
         }else if(invokers.size()==CallbackListenerImpl.CUSTOM_WEIGHT_MAP.size() && !isInit){
