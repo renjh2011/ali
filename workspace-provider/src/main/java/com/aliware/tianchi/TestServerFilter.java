@@ -32,9 +32,6 @@ public class TestServerFilter implements Filter {
 
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
-        if(result.hasException()){
-            invoker.invoke(invocation);
-        }
         return result;
     }
 
