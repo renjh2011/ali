@@ -20,6 +20,11 @@ public class TestClientFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try{
+            String ip = invoker.getUrl().getIp();
+            int port = invoker.getUrl().getPort();
+            ClientStatus.requestCount(ip,port);
+
+            System.out.println("TestClientFilter ------------ invoker = [" + invoker + "], invocation = [" + invocation + "]");
             Result result = invoker.invoke(invocation);
             return result;
         }catch (Exception e){

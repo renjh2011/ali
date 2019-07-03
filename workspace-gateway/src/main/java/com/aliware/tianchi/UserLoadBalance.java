@@ -4,6 +4,7 @@ import org.apache.dubbo.common.URL;
 import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.RpcException;
+import org.apache.dubbo.rpc.RpcStatus;
 import org.apache.dubbo.rpc.cluster.LoadBalance;
 
 import java.util.List;
@@ -21,6 +22,10 @@ public class UserLoadBalance implements LoadBalance {
     private static volatile boolean isInit =false;
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
+        for(Invoker<T> invoker : invokers){
+            RpcStatus status = RpcStatus.getStatus(invoker.getUrl(), invocation.getMethodName());
+            System.out.println(status.getTotal()+"-----------"+status.getActive());
+        }
         return smoothSelect(invokers);
     }
 
