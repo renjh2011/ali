@@ -38,7 +38,7 @@ public class UserLoadBalance implements LoadBalance {
             ClientStatus clientStatus = ClientStatus.getStatus(ip,port);
             if(System.currentTimeMillis()-clientStatus.failedTime.get()<200 || clientStatus.rtt.get()>400){
                 CustomWeight customWeight = CallbackListenerImpl.CUSTOM_WEIGHT_MAP.get(port);
-                customWeight.setWeight(customWeight.getWeight()-50);
+                customWeight.setWeight(customWeight.getWeight()-10);
                 CustomRobin.init(CallbackListenerImpl.CUSTOM_WEIGHT_MAP);
             }
         }
