@@ -39,6 +39,8 @@ public class ClientStatus {
     public synchronized static void responseCount(String ip,int port,boolean fail) {
         ClientStatus clientStatus = getStatus(ip,port);
         if(fail){
+            clientStatus.activeCount.decrementAndGet();
+            clientStatus.responseCount.incrementAndGet();
             clientStatus.failed.incrementAndGet();
             long responseTime = System.currentTimeMillis();
             clientStatus.rtt.set(responseTime-clientStatus.startTime.get());

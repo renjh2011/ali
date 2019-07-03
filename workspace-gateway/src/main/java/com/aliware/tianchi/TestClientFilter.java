@@ -26,15 +26,19 @@ public class TestClientFilter implements Filter {
             Result result = invoker.invoke(invocation);
             return result;
         }catch (Exception e){
-            ClientStatus.responseCount(ip,port,true);
             throw e;
-        }finally {
-            ClientStatus.responseCount(ip,port,false);
         }
     }
 
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
+        String ip = invoker.getUrl().getIp();
+        int port = invoker.getUrl().getPort();
+        if(result.hasException()){
+            ClientStatus.responseCount(ip,port,true);
+        }else {
+            ClientStatus.responseCount(ip, port, false);
+        }
         return result;
     }
 }

@@ -31,24 +31,19 @@ public class UserLoadBalance implements LoadBalance {
     }
 
     private <T> Invoker<T> smoothSelect(List<Invoker<T>> invokers) {
+        if(!isInit){
+            init(invokers);
+        }
         for(Invoker<T> invoker : invokers){
             String ip = invoker.getUrl().getIp();
             int port = invoker.getUrl().getPort();
             ClientStatus clientStatus = ClientStatus.getStatus(ip,port);
             if(System.currentTimeMillis()-clientStatus.failedTime.get()<200 || clientStatus.rtt.get()>400){
-                CustomWeight customWeight = CallbackListenerImpl.CUSTOM_WEIGHT_MAP.get(port);
-                customWeight.setWeight(customWeight.getWeight()-10);
-                CustomRobin.init(CallbackListenerImpl.CUSTOM_WEIGHT_MAP);
+                int originalWeight = CustomRobin.get(port).getWeight().get();
+                CustomRobin.setWeight(port,originalWeight-5);
             }
         }
-        if(invokers.size()>CallbackListenerImpl.CUSTOM_WEIGHT_MAP.size()){
-            return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
-        }else if(invokers.size()==CallbackListenerImpl.CUSTOM_WEIGHT_MAP.size() && !isInit){
-            synchronized (UserLoadBalance.class) {
-                CustomRobin.init(CallbackListenerImpl.CUSTOM_WEIGHT_MAP);
-                isInit = true;
-            }
-        }
+
         Integer port = CustomRobin.getServer();
         if(port==null){
             return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
@@ -59,6 +54,15 @@ public class UserLoadBalance implements LoadBalance {
             }
         }
         return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
+    }
+
+    private synchronized <T> void init(List<Invoker<T>> invokers) {
+        for(Invoker<T> invoker : invokers){
+            String ip = invoker.getUrl().getIp();
+            int port = invoker.getUrl().getPort();
+            CustomRobin.init(port,port,50,0);
+        }
+        isInit=true;
     }
 
 //    private <T> Invoker<T> randomSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
