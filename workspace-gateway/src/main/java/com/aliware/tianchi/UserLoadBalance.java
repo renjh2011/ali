@@ -24,10 +24,10 @@ public class UserLoadBalance implements LoadBalance {
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
         Invoker<T> invoker =  smoothSelect(invokers);
-//        String ip = invoker.getUrl().getIp();
-//        int port = invoker.getUrl().getPort();
-//        ClientStatus clientStatus = ClientStatus.getStatus(ip,port);
-//        System.out.println("ip = "+ip +" port = "+port +" clientStatus = [" + clientStatus + "]");
+        String ip = invoker.getUrl().getIp();
+        int port = invoker.getUrl().getPort();
+        ClientStatus clientStatus = ClientStatus.getStatus(ip,port);
+        System.out.println("ip = "+ip +" port = "+port +" clientStatus = [" + clientStatus + "]");
         return invoker;
     }
 
