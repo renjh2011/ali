@@ -21,12 +21,17 @@ public class TestClientFilter implements Filter {
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         String ip = invoker.getUrl().getIp();
         int port = invoker.getUrl().getPort();
+        ClientStatus.requestCount(ip,port);
+        boolean isSuccess = true;
+        long begin = System.currentTimeMillis();
         try{
-            ClientStatus.requestCount(ip,port);
             Result result = invoker.invoke(invocation);
             return result;
         }catch (Exception e){
+            isSuccess=false;
             throw e;
+        }finally {
+            ClientStatus.responseCount(ip,port,System.currentTimeMillis()-begin, !isSuccess);
         }
     }
 
@@ -34,10 +39,9 @@ public class TestClientFilter implements Filter {
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
         String ip = invoker.getUrl().getIp();
         int port = invoker.getUrl().getPort();
-        if(result.hasException()){
-            ClientStatus.responseCount(ip,port,true);
-        }else {
-            ClientStatus.responseCount(ip, port, false);
+        if(!result.hasException()){
+            String maxThreadPool = result.getAttachment(port+"");
+            RobinLb.getRobinLb(port).set(Integer.parseInt(maxThreadPool),port);
         }
         return result;
     }

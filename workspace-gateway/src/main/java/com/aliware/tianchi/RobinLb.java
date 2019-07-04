@@ -12,7 +12,7 @@ public class RobinLb {
     private AtomicInteger lastWeight = new AtomicInteger(0);
     private AtomicInteger port = new AtomicInteger(0);
 
-    public RobinLb(Integer weight, Integer curWeight, Integer port) {
+    private RobinLb(Integer weight, Integer curWeight, Integer port) {
         this.weight.set(weight);
         this.lastWeight.set(weight);
         this.curWeight.set(curWeight);
@@ -20,10 +20,27 @@ public class RobinLb {
     }
 
     private final static ConcurrentMap<Integer,RobinLb> SERVER_MAP =  new ConcurrentHashMap<>();
-    static {
+    /*static {
         SERVER_MAP.putIfAbsent(20880,new RobinLb(200,0,20880));
         SERVER_MAP.putIfAbsent(20870,new RobinLb(450,0,20870));
         SERVER_MAP.putIfAbsent(20890,new RobinLb(600,0,20890));
+    }*/
+
+    public void set(Integer weight, Integer port){
+        SERVER_MAP.put(port, new RobinLb(weight,0,port));
+    }
+
+    public static RobinLb getRobinLb(Integer port){
+        RobinLb robinLb = SERVER_MAP.get(port);
+        if (robinLb == null) {
+            SERVER_MAP.putIfAbsent(port, new RobinLb(1,0,port));
+            robinLb = SERVER_MAP.get(port);
+        }
+        return robinLb;
+    }
+
+    public static ConcurrentMap<Integer, RobinLb> getServerMap() {
+        return SERVER_MAP;
     }
 
     public static void main(String[] args) {
@@ -31,8 +48,7 @@ public class RobinLb {
             getServer();
         }
     }
-    public static void getServer(){
-        ConcurrentMap<Integer,Integer> tempWeight = new ConcurrentHashMap<>(SERVER_MAP.size());
+    public static Integer getServer(){
         Iterator<Map.Entry<Integer,RobinLb>> iterator = SERVER_MAP.entrySet().iterator();
         int maxWeight=0;
         int totalWight = 0;
@@ -62,8 +78,8 @@ public class RobinLb {
             }
 
         }
-
-        System.out.println(maxWeightRobinLb);
+        return maxWeightRobinLb.getPort().get();
+//        System.out.println(maxWeightRobinLb);
 
     }
 

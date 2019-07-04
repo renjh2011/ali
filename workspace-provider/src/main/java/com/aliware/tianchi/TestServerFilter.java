@@ -8,6 +8,8 @@ import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.Result;
 import org.apache.dubbo.rpc.RpcException;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -32,6 +34,10 @@ public class TestServerFilter implements Filter {
 
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
+        int port = invoker.getUrl().getPort();
+        Map<String,String> map = new HashMap<>();
+        map.put(port+"",ServerStatus.getStatus().getMaxThreadPool()+"");
+        result.addAttachments(map);
         return result;
     }
 

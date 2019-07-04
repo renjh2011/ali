@@ -31,41 +31,15 @@ public class UserLoadBalance implements LoadBalance {
     }
 
     private <T> Invoker<T> smoothSelect(List<Invoker<T>> invokers) {
-        if(!isInit){
-            init(invokers);
-        }
-        for(Invoker<T> invoker : invokers){
-            String ip = invoker.getUrl().getIp();
-            int port = invoker.getUrl().getPort();
-            ClientStatus clientStatus = ClientStatus.getStatus(ip,port);
-            if(System.currentTimeMillis()-clientStatus.failedTime.get()<200 || clientStatus.rtt.get()>400){
-                int originalWeight = CustomRobin.get(port).getWeight().get();
-                CustomRobin.setWeight(port,originalWeight-5);
-            }
-        }
-
-        Integer port = CustomRobin.getServer();
-        if(port==null){
-            return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
-        }
-        for(Invoker<T> invoker : invokers){
-            if(invoker.getUrl().getPort()==port){
-                return invoker;
+        if(invokers.size()== RobinLb.getServerMap().size()){
+            Integer port = RobinLb.getServer();
+            for(Invoker<T> invoker : invokers){
+                if(invoker.getUrl().getPort()==port){
+                    System.out.println("invoker = [" + invoker + "]");
+                    return invoker;
+                }
             }
         }
         return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
     }
-
-    private synchronized <T> void init(List<Invoker<T>> invokers) {
-        for(Invoker<T> invoker : invokers){
-            String ip = invoker.getUrl().getIp();
-            int port = invoker.getUrl().getPort();
-            CustomRobin.init(port,port,50,0);
-        }
-        isInit=true;
-    }
-
-//    private <T> Invoker<T> randomSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
-//        return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
-//    }
 }
