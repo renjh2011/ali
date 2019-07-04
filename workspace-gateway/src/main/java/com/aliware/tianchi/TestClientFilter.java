@@ -43,6 +43,10 @@ public class TestClientFilter implements Filter {
             String maxThreadPool = result.getAttachment(port+"");
             RobinLb.getRobinLb(port).set(Integer.parseInt(maxThreadPool),port);
         }
+        if(result.hasException()){
+            RobinLb robinLb = RobinLb.getRobinLb(port);
+            robinLb.fail(port);
+        }
         return result;
     }
 }

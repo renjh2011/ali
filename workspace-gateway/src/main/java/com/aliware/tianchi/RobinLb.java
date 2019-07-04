@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RobinLb {
@@ -34,6 +35,21 @@ public class RobinLb {
             entry.getValue().setCurWeight(0);
         }
     }
+    public void fail(Integer port){
+        Iterator<Map.Entry<Integer,RobinLb>> iterator = SERVER_MAP.entrySet().iterator();
+        while (iterator.hasNext()){
+            Map.Entry<Integer,RobinLb> entry = iterator.next();
+            RobinLb robinLb = entry.getValue();
+            if(entry.getKey().equals(port)){
+                robinLb.setCurWeight(0);
+                continue;
+            }
+
+            robinLb.setWeight(robinLb.getWeight().get()+2);
+            entry.getValue().setCurWeight(0);
+        }
+    }
+
 
     public static RobinLb getRobinLb(Integer port){
         RobinLb robinLb = SERVER_MAP.get(port);
@@ -55,7 +71,7 @@ public class RobinLb {
     }
     public static Integer getServer(){
         Iterator<Map.Entry<Integer,RobinLb>> iterator = SERVER_MAP.entrySet().iterator();
-        int maxWeight=0;
+        int maxWeight=Integer.MIN_VALUE;
         int totalWight = 0;
         RobinLb maxWeightRobinLb = null;
         while (iterator.hasNext()){

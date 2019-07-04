@@ -43,7 +43,7 @@ public class ClientStatus {
             clientStatus.responseCount.incrementAndGet();
             clientStatus.failed.incrementAndGet();
             long responseTime = System.currentTimeMillis();
-            clientStatus.rtt.set(responseTime-clientStatus.startTime.get());
+            clientStatus.rtt.set(invokeTime);
             clientStatus.failedTime.set(responseTime);
         }else {
             clientStatus.activeCount.decrementAndGet();
