@@ -15,14 +15,14 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CallbackListenerImpl implements CallbackListener {
 //    public static Map<Integer,Integer> TOTAL_MAP =  new ConcurrentHashMap<>(3);
-    public static Map<Integer,CustomWeight> CUSTOM_WEIGHT_MAP =  new ConcurrentHashMap<>(3);
+//    public static Map<Integer,CustomWeight> CUSTOM_WEIGHT_MAP =  new ConcurrentHashMap<>(3);
 //    public static Map<Integer,Integer> ACTIVE_MAP =  new ConcurrentHashMap<>(3);
 //    public volatile static Map<Integer,ProviderStatus> STATUS_MAP =  new ConcurrentHashMap<>(3);
 
 //    private static final Logger LOGGER = LoggerFactory.getLogger(CallbackListenerImpl.class);
     @Override
     public void receiveServerMsg(String msg) {
-        if(msg!=null && !msg.isEmpty()){
+        /*if(msg!=null && !msg.isEmpty()){
             //解析provider端返回的线程池状态
             String[] status = msg.split(",");
             if(status!=null && status.length==3){
@@ -42,12 +42,12 @@ public class CallbackListenerImpl implements CallbackListener {
                 CUSTOM_WEIGHT_MAP.put(port,customWeight);
 //                TOTAL_MAP.put(port,total);
 //                CustomRobin.init(TOTAL_MAP);
-                /*if(TOTAL_MAP.isEmpty()){
+                *//*if(TOTAL_MAP.isEmpty()){
                     TOTAL_MAP.put(port,total);
                 }
-                ACTIVE_MAP.put(port,activeCount);*/
+                ACTIVE_MAP.put(port,activeCount);*//*
             }
-        }
+        }*/
     }
 
 }

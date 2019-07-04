@@ -20,8 +20,7 @@ public class TestRequestLimiter implements RequestLimiter {
      */
     @Override
     public boolean tryAcquire(Request request, int activeTaskCount) {
-        //当连接池耗尽时 不提交
-        return CallbackServiceImpl.TOTAL==-1 || activeTaskCount<=CallbackServiceImpl.TOTAL;
+        return true;
     }
 
 }

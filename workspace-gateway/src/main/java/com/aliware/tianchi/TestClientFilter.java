@@ -19,22 +19,26 @@ import org.apache.dubbo.rpc.RpcException;
 public class TestClientFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
+        String ip = invoker.getUrl().getIp();
+        int port = invoker.getUrl().getPort();
         try{
-            String ip = invoker.getUrl().getIp();
-            int port = invoker.getUrl().getPort();
             ClientStatus.requestCount(ip,port);
-
-            System.out.println("TestClientFilter ------------ invoker = [" + invoker + "], invocation = [" + invocation + "]");
             Result result = invoker.invoke(invocation);
             return result;
         }catch (Exception e){
             throw e;
         }
-
     }
 
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
+        String ip = invoker.getUrl().getIp();
+        int port = invoker.getUrl().getPort();
+        if(result.hasException()){
+            ClientStatus.responseCount(ip,port,true);
+        }else {
+            ClientStatus.responseCount(ip, port, false);
+        }
         return result;
     }
 }
