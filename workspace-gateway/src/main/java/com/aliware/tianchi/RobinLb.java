@@ -28,6 +28,11 @@ public class RobinLb {
 
     public void set(Integer weight, Integer port){
         SERVER_MAP.put(port, new RobinLb(weight,0,port));
+        Iterator<Map.Entry<Integer,RobinLb>> iterator = SERVER_MAP.entrySet().iterator();
+        while (iterator.hasNext()){
+            Map.Entry<Integer,RobinLb> entry = iterator.next();
+            entry.getValue().setCurWeight(0);
+        }
     }
 
     public static RobinLb getRobinLb(Integer port){

@@ -39,7 +39,7 @@ public class TestClientFilter implements Filter {
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
         String ip = invoker.getUrl().getIp();
         int port = invoker.getUrl().getPort();
-        if(!result.hasException()){
+        if(!result.hasException() && RobinLb.getServerMap().get(port)==null){
             String maxThreadPool = result.getAttachment(port+"");
             RobinLb.getRobinLb(port).set(Integer.parseInt(maxThreadPool),port);
         }
