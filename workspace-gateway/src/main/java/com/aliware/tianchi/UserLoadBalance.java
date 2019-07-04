@@ -35,7 +35,7 @@ public class UserLoadBalance implements LoadBalance {
             Integer port = RobinLb.getServer();
             for(Invoker<T> invoker : invokers){
                 if(invoker.getUrl().getPort()==port){
-                    System.out.println("invoker = [" + invoker + "]");
+//                    System.out.println("invoker = [" + invoker + "]");
                     return invoker;
                 }
             }
