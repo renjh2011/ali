@@ -45,7 +45,7 @@ public class RobinLb {
                 continue;
             }
 
-            robinLb.setWeight(robinLb.getWeight().get()+2);
+            robinLb.setWeight(robinLb.getWeight().get()+20);
             entry.getValue().setCurWeight(0);
         }
     }
