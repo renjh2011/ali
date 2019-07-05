@@ -41,13 +41,13 @@ public class RobinLb {
             Map.Entry<Integer,RobinLb> entry = iterator.next();
             RobinLb robinLb = entry.getValue();
             if(entry.getKey().equals(port)){
-                robinLb.setWeight(robinLb.getWeight().get()-5);
+                robinLb.setWeight(robinLb.getWeight().get()-1);
                 robinLb.setCurWeight(0);
                 continue;
             }
             ClientStatus clientStatus = ClientStatus.getStatus(ip,port);
-            if(System.currentTimeMillis()-clientStatus.failedTime.get()>1000) {
-                robinLb.setWeight(robinLb.getWeight().get() + 10);
+            if(System.currentTimeMillis()-clientStatus.failedTime.get()>500) {
+                robinLb.setWeight(robinLb.getWeight().get() + 15);
                 entry.getValue().setCurWeight(0);
             }
         }
