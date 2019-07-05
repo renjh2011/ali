@@ -21,7 +21,7 @@ public class CallbackServiceImpl implements CallbackService {
     public static volatile int TOTAL = -1;
 
     public CallbackServiceImpl() {
-        timer.schedule(new TimerTask() {
+        /*timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 if (!listeners.isEmpty()) {
@@ -49,20 +49,20 @@ public class CallbackServiceImpl implements CallbackService {
                     }
                 }
             }
-        }, 0, 1000);
+        }, 0, 5000);*/
     }
 
-    private Timer timer = new Timer();
+//    private Timer timer = new Timer();
 
     /**
      * key: listener type
      * value: callback listener
      */
-    private final Map<String, CallbackListener> listeners = new ConcurrentHashMap<>();
+//    private final Map<String, CallbackListener> listeners = new ConcurrentHashMap<>();
 
     @Override
     public void addListener(String key, CallbackListener listener) {
-        listeners.put(key, listener);
-        listener.receiveServerMsg(new Date().toString()); // send notification for change
+//        listeners.put(key, listener);
+//        listener.receiveServerMsg(new Date().toString()); // send notification for change
     }
 }
