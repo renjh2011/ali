@@ -22,8 +22,6 @@ import java.util.concurrent.ThreadLocalRandom;
  * 选手需要基于此类实现自己的负载均衡算法
  */
 public class UserLoadBalance implements LoadBalance {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CallbackListenerImpl.class);
-    private static volatile boolean isInit =false;
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
         Invoker<T> invoker =  smoothSelect(invokers);

@@ -1,12 +1,16 @@
 package com.aliware.tianchi;
 
 import org.apache.dubbo.common.Constants;
+import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.extension.Activate;
 import org.apache.dubbo.rpc.Filter;
 import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.Result;
 import org.apache.dubbo.rpc.RpcException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author daofeng.xjf
@@ -19,24 +23,19 @@ import org.apache.dubbo.rpc.RpcException;
 public class TestClientFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
-        String ip = invoker.getUrl().getIp();
-        int port = invoker.getUrl().getPort();
+
 //        ClientStatus.requestCount(ip,port);
-        boolean isSuccess = true;
-        long begin = System.currentTimeMillis();
         try{
             Result result = invoker.invoke(invocation);
             return result;
         }catch (Exception e){
-            isSuccess=false;
             throw e;
-        }finally {
-//            ClientStatus.responseCount(ip,port,System.currentTimeMillis()-begin, !isSuccess);
         }
     }
 
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
+//        boolean isSuccess = true;
         String ip = invoker.getUrl().getIp();
         int port = invoker.getUrl().getPort();
         if(!result.hasException() && RobinLb.getServerMap().get(port)==null){
@@ -46,7 +45,9 @@ public class TestClientFilter implements Filter {
         if(result.hasException()){
             RobinLb robinLb = RobinLb.getRobinLb(port);
             robinLb.fail(port);
+//            isSuccess=false;
         }
+//        ClientStatus.responseCount(ip,port, !isSuccess);
         return result;
     }
 }

@@ -1,4 +1,3 @@
-/*
 package com.aliware.tianchi;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,8 +12,8 @@ public class ClientStatus {
     final AtomicInteger activeCount = new AtomicInteger(0);
     final AtomicLong requestCount = new AtomicLong(0);
     final AtomicLong responseCount = new AtomicLong(0);
-    final AtomicLong startTime = new AtomicLong();
-    final AtomicLong rtt = new AtomicLong();
+//    final AtomicLong startTime = new AtomicLong();
+//    final AtomicLong rtt = new AtomicLong();
     final AtomicLong failedTime = new AtomicLong();
     private ClientStatus(){
 
@@ -24,7 +23,7 @@ public class ClientStatus {
         ClientStatus clientStatus = getStatus(ip,port);
         clientStatus.activeCount.incrementAndGet();
         clientStatus.requestCount.incrementAndGet();
-        clientStatus.startTime.set(System.currentTimeMillis());
+//        clientStatus.startTime.set(System.currentTimeMillis());
     }
 
     public synchronized static ClientStatus getStatus(String ip,int port) {
@@ -37,19 +36,18 @@ public class ClientStatus {
         return status;
     }
 
-    public synchronized static void responseCount(String ip,int port,long invokeTime,boolean fail) {
+    public synchronized static void responseCount(String ip,int port,boolean fail) {
         ClientStatus clientStatus = getStatus(ip,port);
         if(fail){
             clientStatus.activeCount.decrementAndGet();
             clientStatus.responseCount.incrementAndGet();
             clientStatus.failed.incrementAndGet();
-            long responseTime = System.currentTimeMillis();
-            clientStatus.rtt.set(invokeTime);
-            clientStatus.failedTime.set(responseTime);
+//            clientStatus.rtt.set(invokeTime);
+            clientStatus.failedTime.set(System.currentTimeMillis());
         }else {
             clientStatus.activeCount.decrementAndGet();
             clientStatus.responseCount.incrementAndGet();
-            clientStatus.rtt.set(invokeTime);
+//            clientStatus.rtt.set(invokeTime);
         }
 
     }
@@ -61,8 +59,6 @@ public class ClientStatus {
                 ", activeCount=" + activeCount.get() +
                 ", requestCount=" + requestCount.get() +
                 ", responseCount=" + responseCount.get() +
-                ", rtt=" + rtt.get() +
                 '}';
     }
 }
-*/

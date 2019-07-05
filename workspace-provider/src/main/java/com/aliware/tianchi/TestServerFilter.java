@@ -10,6 +10,7 @@ import org.apache.dubbo.rpc.RpcException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -21,11 +22,18 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Activate(group = Constants.PROVIDER)
 public class TestServerFilter implements Filter {
+    private final static ArrayBlockingQueue<InvokerInvacation> buffer = new ArrayBlockingQueue<>(ServerStatus.getMaxThreadPool()+100);
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try{
+            InvokerInvacation invokerInvacation = new InvokerInvacation(invoker,invocation);
+            buffer.offer(invokerInvacation);
+            buffer.take();
             Result result = invoker.invoke(invocation);
             return result;
+        }
+        catch (InterruptedException e){
+            throw new RpcException(e.getMessage());
         }catch (Exception e){
             throw e;
         }
@@ -35,8 +43,8 @@ public class TestServerFilter implements Filter {
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
         int port = invoker.getUrl().getPort();
-        Map<String,String> map = new HashMap<>();
-        map.put(port+"",ServerStatus.getStatus().getMaxThreadPool()+"");
+        Map<String,String> map = new HashMap<>(1);
+        map.put(port+"",ServerStatus.getMaxThreadPool()+"");
         result.addAttachments(map);
         return result;
     }

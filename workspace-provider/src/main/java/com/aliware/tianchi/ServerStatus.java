@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ServerStatus {
-    private AtomicInteger MAX_THREAD_POOL = new AtomicInteger(0);
+    private static AtomicInteger MAX_THREAD_POOL = new AtomicInteger(0);
     private static ServerStatus status = new ServerStatus();
 
     private ServerStatus(){
@@ -30,7 +30,7 @@ public class ServerStatus {
        return status;
     }
 
-    public Integer getMaxThreadPool() {
+    public static Integer getMaxThreadPool() {
         return MAX_THREAD_POOL.get();
     }
 }
