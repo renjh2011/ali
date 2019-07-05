@@ -1,3 +1,4 @@
+/*
 package com.aliware.tianchi;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -64,3 +65,4 @@ public class ClientStatus {
                 '}';
     }
 }
+*/

@@ -21,7 +21,7 @@ public class TestClientFilter implements Filter {
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         String ip = invoker.getUrl().getIp();
         int port = invoker.getUrl().getPort();
-        ClientStatus.requestCount(ip,port);
+//        ClientStatus.requestCount(ip,port);
         boolean isSuccess = true;
         long begin = System.currentTimeMillis();
         try{
@@ -31,7 +31,7 @@ public class TestClientFilter implements Filter {
             isSuccess=false;
             throw e;
         }finally {
-            ClientStatus.responseCount(ip,port,System.currentTimeMillis()-begin, !isSuccess);
+//            ClientStatus.responseCount(ip,port,System.currentTimeMillis()-begin, !isSuccess);
         }
     }
 
