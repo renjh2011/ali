@@ -35,18 +35,21 @@ public class RobinLb {
             entry.getValue().setCurWeight(0);
         }
     }
-    public void fail(Integer port){
+    public void fail(String ip,Integer port){
         Iterator<Map.Entry<Integer,RobinLb>> iterator = SERVER_MAP.entrySet().iterator();
         while (iterator.hasNext()){
             Map.Entry<Integer,RobinLb> entry = iterator.next();
             RobinLb robinLb = entry.getValue();
             if(entry.getKey().equals(port)){
+                robinLb.setWeight(robinLb.getWeight().get()-5);
                 robinLb.setCurWeight(0);
                 continue;
             }
-
-            robinLb.setWeight(robinLb.getWeight().get()+10);
-            entry.getValue().setCurWeight(0);
+            ClientStatus clientStatus = ClientStatus.getStatus(ip,port);
+            if(System.currentTimeMillis()-clientStatus.failedTime.get()>1000) {
+                robinLb.setWeight(robinLb.getWeight().get() + 10);
+                entry.getValue().setCurWeight(0);
+            }
         }
     }
 

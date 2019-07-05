@@ -23,8 +23,9 @@ import java.util.Map;
 public class TestClientFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
-
-//        ClientStatus.requestCount(ip,port);
+        String ip = invoker.getUrl().getIp();
+        int port = invoker.getUrl().getPort();
+        ClientStatus.requestCount(ip,port);
         try{
             Result result = invoker.invoke(invocation);
             return result;
@@ -35,7 +36,7 @@ public class TestClientFilter implements Filter {
 
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
-//        boolean isSuccess = true;
+        boolean isSuccess = true;
         String ip = invoker.getUrl().getIp();
         int port = invoker.getUrl().getPort();
         if(!result.hasException() && RobinLb.getServerMap().get(port)==null){
@@ -44,10 +45,10 @@ public class TestClientFilter implements Filter {
         }
         if(result.hasException()){
             RobinLb robinLb = RobinLb.getRobinLb(port);
-            robinLb.fail(port);
-//            isSuccess=false;
+            robinLb.fail(ip,port);
+            isSuccess=false;
         }
-//        ClientStatus.responseCount(ip,port, !isSuccess);
+        ClientStatus.responseCount(ip,port, !isSuccess);
         return result;
     }
 }

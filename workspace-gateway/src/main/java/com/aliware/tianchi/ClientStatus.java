@@ -19,14 +19,14 @@ public class ClientStatus {
 
     }
 
-    public synchronized static void requestCount(String ip,int port) {
+    public static void requestCount(String ip,int port) {
         ClientStatus clientStatus = getStatus(ip,port);
         clientStatus.activeCount.incrementAndGet();
         clientStatus.requestCount.incrementAndGet();
 //        clientStatus.startTime.set(System.currentTimeMillis());
     }
 
-    public synchronized static ClientStatus getStatus(String ip,int port) {
+    public static ClientStatus getStatus(String ip,int port) {
         String key = ip+port;
         ClientStatus status = SERVICE_STATISTICS.get(key);
         if (status == null) {
@@ -36,7 +36,7 @@ public class ClientStatus {
         return status;
     }
 
-    public synchronized static void responseCount(String ip,int port,boolean fail) {
+    public static void responseCount(String ip,int port,boolean fail) {
         ClientStatus clientStatus = getStatus(ip,port);
         if(fail){
             clientStatus.activeCount.decrementAndGet();
