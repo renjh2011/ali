@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RobinLb {
@@ -20,14 +19,14 @@ public class RobinLb {
         this.port.set(port);
     }
 
-    private final static ConcurrentMap<Integer,RobinLb> SERVER_MAP =  new ConcurrentHashMap<>();
+    private volatile static ConcurrentMap<Integer,RobinLb> SERVER_MAP =  new ConcurrentHashMap<>();
     /*static {
         SERVER_MAP.putIfAbsent(20880,new RobinLb(200,0,20880));
         SERVER_MAP.putIfAbsent(20870,new RobinLb(450,0,20870));
         SERVER_MAP.putIfAbsent(20890,new RobinLb(600,0,20890));
     }*/
 
-    public void set(Integer weight, Integer port){
+    public void set(Integer weight,Integer port){
         SERVER_MAP.put(port, new RobinLb(weight,0,port));
         Iterator<Map.Entry<Integer,RobinLb>> iterator = SERVER_MAP.entrySet().iterator();
         while (iterator.hasNext()){
@@ -35,22 +34,27 @@ public class RobinLb {
             entry.getValue().setCurWeight(0);
         }
     }
-    public void fail(String ip,Integer port){
-        Iterator<Map.Entry<Integer,RobinLb>> iterator = SERVER_MAP.entrySet().iterator();
+    public synchronized void fail(String ip,Integer port){
+        ConcurrentMap<Integer,RobinLb> map = new ConcurrentHashMap(SERVER_MAP);
+        Iterator<Map.Entry<Integer,RobinLb>> iterator = map.entrySet().iterator();
         while (iterator.hasNext()){
             Map.Entry<Integer,RobinLb> entry = iterator.next();
             RobinLb robinLb = entry.getValue();
+            ClientStatus clientStatus = ClientStatus.getStatus(ip,port);
             if(entry.getKey().equals(port)){
                 robinLb.setWeight(robinLb.getWeight().get()-5);
+                robinLb.setLastWeight(robinLb.getWeight().get());
                 robinLb.setCurWeight(0);
                 continue;
             }
-            ClientStatus clientStatus = ClientStatus.getStatus(ip,port);
-            if(System.currentTimeMillis()-clientStatus.failedTime.get()>500) {
-                robinLb.setWeight(robinLb.getWeight().get() + 10);
-                entry.getValue().setCurWeight(0);
+            long time = System.currentTimeMillis()-clientStatus.lastFailedTime.get();
+            if(time>500) {
+                robinLb.setWeight(robinLb.getWeight().get() + 15);
             }
+            robinLb.setLastWeight(robinLb.getWeight().get());
+            entry.getValue().setCurWeight(0);
         }
+        SERVER_MAP=map;
     }
 
 
@@ -73,6 +77,7 @@ public class RobinLb {
         }
     }
     public static Integer getServer(){
+//        System.out.println(SERVER_MAP);
         Iterator<Map.Entry<Integer,RobinLb>> iterator = SERVER_MAP.entrySet().iterator();
         int maxWeight=Integer.MIN_VALUE;
         int totalWight = 0;
@@ -125,6 +130,14 @@ public class RobinLb {
 
     public AtomicInteger getPort() {
         return port;
+    }
+
+    public Integer getLastWeight() {
+        return lastWeight.get();
+    }
+
+    public void setLastWeight(Integer lastWeight) {
+        this.lastWeight.set(lastWeight);
     }
 
     @Override

@@ -44,8 +44,10 @@ public class TestClientFilter implements Filter {
             RobinLb.getRobinLb(port).set(Integer.parseInt(maxThreadPool),port);
         }
         if(result.hasException()){
-            RobinLb robinLb = RobinLb.getRobinLb(port);
-            robinLb.fail(ip,port);
+            if((System.currentTimeMillis()-ClientStatus.getStatus(ip,port).lastFailedTime.get())<200) {
+                RobinLb robinLb = RobinLb.getRobinLb(port);
+                robinLb.fail(ip,port);
+            }
             isSuccess=false;
         }
         ClientStatus.responseCount(ip,port, !isSuccess);

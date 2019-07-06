@@ -15,6 +15,7 @@ public class ClientStatus {
 //    final AtomicLong startTime = new AtomicLong();
 //    final AtomicLong rtt = new AtomicLong();
     final AtomicLong failedTime = new AtomicLong();
+    final AtomicLong lastFailedTime = new AtomicLong();
     private ClientStatus(){
 
     }
@@ -42,6 +43,7 @@ public class ClientStatus {
             clientStatus.activeCount.decrementAndGet();
             clientStatus.responseCount.incrementAndGet();
             clientStatus.failed.incrementAndGet();
+            clientStatus.lastFailedTime.set(clientStatus.failedTime.get());
 //            clientStatus.rtt.set(invokeTime);
             clientStatus.failedTime.set(System.currentTimeMillis());
         }else {
