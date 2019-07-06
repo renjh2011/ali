@@ -34,7 +34,7 @@ public class RobinLb {
             entry.getValue().setCurWeight(0);
         }
     }
-    public void fail(String ip,Integer port){
+    public void fail(Integer port){
         Iterator<Map.Entry<Integer,RobinLb>> iterator = SERVER_MAP.entrySet().iterator();
         while (iterator.hasNext()){
             Map.Entry<Integer,RobinLb> entry = iterator.next();

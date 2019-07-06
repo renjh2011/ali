@@ -46,7 +46,7 @@ public class TestClientFilter implements Filter {
         if(result.hasException()){
             if((System.currentTimeMillis()-ClientStatus.getStatus(ip,port).lastFailedTime.get())<200) {
                 RobinLb robinLb = RobinLb.getRobinLb(port);
-                robinLb.fail(ip,port);
+                robinLb.fail(port);
             }
             isSuccess=false;
         }
