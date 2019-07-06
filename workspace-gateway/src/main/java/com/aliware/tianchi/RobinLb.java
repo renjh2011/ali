@@ -20,11 +20,11 @@ public class RobinLb {
     }
 
     private volatile static ConcurrentMap<Integer,RobinLb> SERVER_MAP =  new ConcurrentHashMap<>();
-    static {
+   /* static {
         SERVER_MAP.putIfAbsent(20880,new RobinLb(170,0,20880));
         SERVER_MAP.putIfAbsent(20870,new RobinLb(450,0,20870));
         SERVER_MAP.putIfAbsent(20890,new RobinLb(600,0,20890));
-    }
+    }*/
 
     public void set(Integer weight,Integer port){
         SERVER_MAP.put(port, new RobinLb(weight,0,port));
