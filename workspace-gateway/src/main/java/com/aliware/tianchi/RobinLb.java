@@ -54,12 +54,12 @@ public class RobinLb {
                 if(robinLb.port.get()==port){
                     continue;
                 }
-                robinLb.setWeight(robinLb.getWeight().get() + 50);
+                robinLb.setWeight(robinLb.getWeight().get() + 2);
                 robinLb.setLastWeight(robinLb.getWeight().get());
                 robinLb.setCurWeight(0);
             }else {
                 if(robinLb.getWeight().get()>tempRobinLb.getWeight().get()){
-                    robinLb.setWeight(robinLb.getWeight().get() + 150);
+                    robinLb.setWeight(robinLb.getWeight().get() + 5);
                     robinLb.setLastWeight(robinLb.getWeight().get());
                     robinLb.setCurWeight(0);
                     continue;
