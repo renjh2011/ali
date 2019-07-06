@@ -45,7 +45,6 @@ public class RobinLb {
                 tempRobinLb = entry.getValue();
             }
         }
-
         iterator = SERVER_MAP.entrySet().iterator();
         while (iterator.hasNext()){
             Map.Entry<Integer,RobinLb> entry = iterator.next();
@@ -54,12 +53,12 @@ public class RobinLb {
                 if(robinLb.port.get()==port){
                     continue;
                 }
-                robinLb.setWeight(robinLb.getWeight().get() + 2);
+                robinLb.setWeight(robinLb.getWeight().get() + 10);
                 robinLb.setLastWeight(robinLb.getWeight().get());
                 robinLb.setCurWeight(0);
             }else {
                 if(robinLb.getWeight().get()>tempRobinLb.getWeight().get()){
-                    robinLb.setWeight(robinLb.getWeight().get() + 5);
+                    robinLb.setWeight(robinLb.getWeight().get() + 20);
                     robinLb.setLastWeight(robinLb.getWeight().get());
                     robinLb.setCurWeight(0);
                     continue;

@@ -15,9 +15,9 @@ import org.apache.dubbo.rpc.*;
 public class TestClientFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
-        String ip = invoker.getUrl().getIp();
-        int port = invoker.getUrl().getPort();
-        ClientStatus.requestCount(ip,port);
+//        String ip = invoker.getUrl().getIp();
+//        int port = invoker.getUrl().getPort();
+//        ClientStatus.requestCount(ip,port);
         try{
             Result result = invoker.invoke(invocation);
             return result;
@@ -36,13 +36,13 @@ public class TestClientFilter implements Filter {
             RobinLb.getRobinLb(port).set(Integer.parseInt(maxThreadPool),port);
         }
         if(result.hasException()){
-            if((System.currentTimeMillis()-ClientStatus.getStatus(ip,port).failedTime.get())<200) {
+//            if((System.currentTimeMillis()-ClientStatus.getStatus(ip,port).failedTime.get())<200) {
                 RobinLb robinLb = RobinLb.getRobinLb(port);
                 robinLb.fail(port);
-            }
+//            }
             isSuccess=false;
         }
-        ClientStatus.responseCount(ip,port, !isSuccess);
+//        ClientStatus.responseCount(ip,port, !isSuccess);
         return result;
     }
 }
