@@ -12,10 +12,8 @@ public class ClientStatus {
     final AtomicInteger activeCount = new AtomicInteger(0);
     final AtomicLong requestCount = new AtomicLong(0);
     final AtomicLong responseCount = new AtomicLong(0);
-//    final AtomicLong startTime = new AtomicLong();
-//    final AtomicLong rtt = new AtomicLong();
     final AtomicLong failedTime = new AtomicLong();
-    final AtomicLong lastFailedTime = new AtomicLong();
+//    final AtomicLong lastFailedTime = new AtomicLong();
     private ClientStatus(){
 
     }
@@ -24,7 +22,6 @@ public class ClientStatus {
         ClientStatus clientStatus = getStatus(ip,port);
         clientStatus.activeCount.incrementAndGet();
         clientStatus.requestCount.incrementAndGet();
-//        clientStatus.startTime.set(System.currentTimeMillis());
     }
 
     public static ClientStatus getStatus(String ip,int port) {
@@ -43,13 +40,11 @@ public class ClientStatus {
             clientStatus.activeCount.decrementAndGet();
             clientStatus.responseCount.incrementAndGet();
             clientStatus.failed.incrementAndGet();
-            clientStatus.lastFailedTime.set(clientStatus.failedTime.get());
-//            clientStatus.rtt.set(invokeTime);
+//            clientStatus.lastFailedTime.set(clientStatus.failedTime.get());
             clientStatus.failedTime.set(System.currentTimeMillis());
         }else {
             clientStatus.activeCount.decrementAndGet();
             clientStatus.responseCount.incrementAndGet();
-//            clientStatus.rtt.set(invokeTime);
         }
 
     }

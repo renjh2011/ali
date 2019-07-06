@@ -1,16 +1,8 @@
 package com.aliware.tianchi;
 
 import org.apache.dubbo.common.Constants;
-import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.extension.Activate;
-import org.apache.dubbo.rpc.Filter;
-import org.apache.dubbo.rpc.Invocation;
-import org.apache.dubbo.rpc.Invoker;
-import org.apache.dubbo.rpc.Result;
-import org.apache.dubbo.rpc.RpcException;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.apache.dubbo.rpc.*;
 
 /**
  * @author daofeng.xjf
@@ -44,7 +36,7 @@ public class TestClientFilter implements Filter {
             RobinLb.getRobinLb(port).set(Integer.parseInt(maxThreadPool),port);
         }
         if(result.hasException()){
-            if((System.currentTimeMillis()-ClientStatus.getStatus(ip,port).lastFailedTime.get())<200) {
+            if((System.currentTimeMillis()-ClientStatus.getStatus(ip,port).failedTime.get())<200) {
                 RobinLb robinLb = RobinLb.getRobinLb(port);
                 robinLb.fail(port);
             }
