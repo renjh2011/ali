@@ -36,18 +36,35 @@ public class RobinLb {
     }
     public void fail(Integer port){
         Iterator<Map.Entry<Integer,RobinLb>> iterator = SERVER_MAP.entrySet().iterator();
+        RobinLb tempRobinLb = null;
+        int maxWeight=Integer.MIN_VALUE;
+        while (iterator.hasNext()){
+            Map.Entry<Integer,RobinLb> entry = iterator.next();
+            maxWeight=maxWeight<entry.getValue().getWeight().get()?entry.getValue().getWeight().get():maxWeight;
+            if(entry.getKey().equals(port)){
+                tempRobinLb = entry.getValue();
+            }
+        }
+
+        iterator = SERVER_MAP.entrySet().iterator();
         while (iterator.hasNext()){
             Map.Entry<Integer,RobinLb> entry = iterator.next();
             RobinLb robinLb = entry.getValue();
-            if(entry.getKey().equals(port)){
-                robinLb.setWeight(robinLb.getWeight().get()-5);
+            if(maxWeight==tempRobinLb.getWeight().get()){
+                if(robinLb.port.get()==port){
+                    continue;
+                }
+                robinLb.setWeight(robinLb.getWeight().get() + 5);
                 robinLb.setLastWeight(robinLb.getWeight().get());
                 robinLb.setCurWeight(0);
-                continue;
+            }else {
+                if(robinLb.getWeight().get()>tempRobinLb.getWeight().get()){
+                    robinLb.setWeight(robinLb.getWeight().get() + 15);
+                    robinLb.setLastWeight(robinLb.getWeight().get());
+                    robinLb.setCurWeight(0);
+                    continue;
+                }
             }
-            robinLb.setWeight(robinLb.getWeight().get() + 15);
-            robinLb.setLastWeight(robinLb.getWeight().get());
-            robinLb.setCurWeight(0);
         }
     }
 
