@@ -19,7 +19,7 @@ public class RobinLb {
         this.port.set(port);
     }
 
-    private volatile static ConcurrentMap<Integer,RobinLb> SERVER_MAP =  new ConcurrentHashMap<>();
+    private static ConcurrentMap<Integer,RobinLb> SERVER_MAP =  new ConcurrentHashMap<>();
    /* static {
         SERVER_MAP.putIfAbsent(20880,new RobinLb(170,0,20880));
         SERVER_MAP.putIfAbsent(20870,new RobinLb(450,0,20870));
