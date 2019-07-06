@@ -35,8 +35,7 @@ public class RobinLb {
         }
     }
     public void fail(String ip,Integer port){
-        ConcurrentMap<Integer,RobinLb> map = new ConcurrentHashMap(SERVER_MAP);
-        Iterator<Map.Entry<Integer,RobinLb>> iterator = map.entrySet().iterator();
+        Iterator<Map.Entry<Integer,RobinLb>> iterator = SERVER_MAP.entrySet().iterator();
         while (iterator.hasNext()){
             Map.Entry<Integer,RobinLb> entry = iterator.next();
             RobinLb robinLb = entry.getValue();
@@ -50,7 +49,6 @@ public class RobinLb {
             robinLb.setLastWeight(robinLb.getWeight().get());
             robinLb.setCurWeight(0);
         }
-        SERVER_MAP=map;
     }
 
 
