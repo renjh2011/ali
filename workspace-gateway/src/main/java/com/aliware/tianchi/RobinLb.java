@@ -34,25 +34,21 @@ public class RobinLb {
             entry.getValue().setCurWeight(0);
         }
     }
-    public synchronized void fail(String ip,Integer port){
+    public void fail(String ip,Integer port){
         ConcurrentMap<Integer,RobinLb> map = new ConcurrentHashMap(SERVER_MAP);
         Iterator<Map.Entry<Integer,RobinLb>> iterator = map.entrySet().iterator();
         while (iterator.hasNext()){
             Map.Entry<Integer,RobinLb> entry = iterator.next();
             RobinLb robinLb = entry.getValue();
-            ClientStatus clientStatus = ClientStatus.getStatus(ip,port);
             if(entry.getKey().equals(port)){
                 robinLb.setWeight(robinLb.getWeight().get()-5);
                 robinLb.setLastWeight(robinLb.getWeight().get());
                 robinLb.setCurWeight(0);
                 continue;
             }
-            long time = System.currentTimeMillis()-clientStatus.lastFailedTime.get();
-            if(time>500) {
-                robinLb.setWeight(robinLb.getWeight().get() + 15);
-            }
+            robinLb.setWeight(robinLb.getWeight().get() + 15);
             robinLb.setLastWeight(robinLb.getWeight().get());
-            entry.getValue().setCurWeight(0);
+            robinLb.setCurWeight(0);
         }
         SERVER_MAP=map;
     }
