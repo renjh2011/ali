@@ -20,7 +20,7 @@ public class TestClientFilter implements Filter {
         int port = invoker.getUrl().getPort();
         ClientStatus clientStatus = ClientStatus.requestCount(ip,port,true);
 //        ClientStatus clientStatus = ClientStatus.getStatus(ip,port);
-        if(clientStatus.activeCount.get()>clientStatus.maxThread.get()+2){
+        if(clientStatus.activeCount.get()>clientStatus.maxThread.get()+5){
             ClientStatus.requestCount(ip, port,false);
             return null;
         }
