@@ -37,7 +37,7 @@ public class UserLoadBalance implements LoadBalance {
                 URL invokerUrl = invoker.getUrl();
                 ClientStatus clientStatus = ClientStatus.getStatus(invokerUrl.getIp(), invokerUrl.getPort());
                 int free = clientStatus.maxThread.get() - clientStatus.activeCount.get();
-                if (free > 10) {
+                if (free > 20) {
                     return invoker;
                 }
                 if (max < free) {
@@ -45,7 +45,7 @@ public class UserLoadBalance implements LoadBalance {
                     maxInvoker = invoker;
                 }
             }
-            if(max>0){
+            if(max>20){
                 return maxInvoker;
             }
 //            int j = 0;
