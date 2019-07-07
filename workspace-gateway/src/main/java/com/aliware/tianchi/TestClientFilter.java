@@ -18,12 +18,12 @@ public class TestClientFilter implements Filter {
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         String ip = invoker.getUrl().getIp();
         int port = invoker.getUrl().getPort();
-        ClientStatus clientStatus = ClientStatus.requestCount(ip,port,true);
+        ClientStatus.requestCount(ip,port,true);
 //        ClientStatus clientStatus = ClientStatus.getStatus(ip,port);
-        if(clientStatus.activeCount.get()>clientStatus.maxThread.get()+5){
+        /*if(clientStatus.activeCount.get()>clientStatus.maxThread.get()+5){
             ClientStatus.requestCount(ip, port,false);
             return null;
-        }
+        }*/
         return invoker.invoke(invocation);
 //        return result;
     }
