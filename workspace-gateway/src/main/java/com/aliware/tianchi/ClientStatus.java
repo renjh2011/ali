@@ -9,16 +9,16 @@ public class ClientStatus {
     private static final ConcurrentMap<String, ClientStatus> SERVICE_STATISTICS = new ConcurrentHashMap<>();
 
     final AtomicInteger activeCount = new AtomicInteger(0);
-    final AtomicLong requestCount = new AtomicLong(0);
+//    final AtomicLong requestCount = new AtomicLong(0);
 //    final AtomicLong responseCount = new AtomicLong(0);
-    final AtomicInteger maxThread = new AtomicInteger(Integer.MAX_VALUE-200);
+    final AtomicInteger maxThread = new AtomicInteger(Integer.MAX_VALUE);
     private ClientStatus(){
 
     }
 
     public static ClientStatus requestCount(String ip,int port,boolean success) {
         ClientStatus clientStatus = getStatus(ip,port);
-        clientStatus.requestCount.incrementAndGet();
+//        clientStatus.requestCount.incrementAndGet();
         if(success) {
             clientStatus.activeCount.incrementAndGet();
         }else {
@@ -39,13 +39,14 @@ public class ClientStatus {
 
     public static ClientStatus responseCount(String ip,int port,boolean fail) {
         ClientStatus clientStatus = getStatus(ip,port);
-        if(fail){
+        clientStatus.activeCount.decrementAndGet();
+        /*if(fail){
             clientStatus.activeCount.decrementAndGet();
 //            clientStatus.responseCount.incrementAndGet();
         }else {
             clientStatus.activeCount.decrementAndGet();
 //            clientStatus.responseCount.incrementAndGet();
-        }
+        }*/
         return clientStatus;
     }
 
@@ -53,7 +54,7 @@ public class ClientStatus {
     public String toString() {
         return "ClientStatus{" +
                 ", activeCount=" + activeCount.get() +
-                ", requestCount=" + requestCount.get() +
+//                ", requestCount=" + requestCount.get() +
 //                ", responseCount=" + responseCount.get() +
                 '}';
     }

@@ -1,6 +1,7 @@
 package com.aliware.tianchi;
 
 import org.apache.dubbo.common.Constants;
+import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.extension.Activate;
 import org.apache.dubbo.rpc.*;
 
@@ -16,8 +17,9 @@ public class TestClientFilter implements Filter {
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
-        String ip = invoker.getUrl().getIp();
-        int port = invoker.getUrl().getPort();
+        URL url = invoker.getUrl();
+        String ip = url.getIp();
+        int port = url.getPort();
         ClientStatus.requestCount(ip,port,true);
 //        ClientStatus clientStatus = ClientStatus.getStatus(ip,port);
         /*if(clientStatus.activeCount.get()>clientStatus.maxThread.get()+5){
@@ -32,18 +34,18 @@ public class TestClientFilter implements Filter {
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
         String ip = invoker.getUrl().getIp();
         int port = invoker.getUrl().getPort();
-        boolean isSuccess = true;
-        if (!result.hasException()){
-            ClientStatus clientStatus = ClientStatus.getStatus(ip, port);
-            if(clientStatus.getStatus(ip, port).maxThread.get()==(Integer.MAX_VALUE-200)){
-                String maxThreadPool = result.getAttachment(port + "");
-                int max = Integer.parseInt(maxThreadPool);
-                ClientStatus.getStatus(ip, port).maxThread.set(max);
-            }
-        }else {
-            isSuccess=false;
+        if (!result.hasException() && RobinLb.getServerMap().get(port)==null){
+//            ClientStatus clientStatus = ClientStatus.getStatus(ip, port);
+            String maxThreadPool = result.getAttachment(port + "");
+            int max = Integer.parseInt(maxThreadPool);
+            ClientStatus.getStatus(ip, port).maxThread.set(max);
+            RobinLb robinLb = RobinLb.getRobinLb(port);
+            robinLb.set(max,port);
+            /*if(clientStatus.getStatus(ip, port).maxThread.get()==Integer.MAX_VALUE){
+
+            }*/
         }
-        ClientStatus.responseCount(ip, port, !isSuccess);
+        ClientStatus.responseCount(ip, port, true);
         return result;
     }
 

@@ -1,4 +1,3 @@
-/*
 package com.aliware.tianchi;
 
 import java.util.Iterator;
@@ -21,12 +20,11 @@ public class RobinLb {
     }
 
     private static ConcurrentMap<Integer,RobinLb> SERVER_MAP =  new ConcurrentHashMap<>();
-   */
-/* static {
+ /*static {
         SERVER_MAP.putIfAbsent(20880,new RobinLb(170,0,20880));
         SERVER_MAP.putIfAbsent(20870,new RobinLb(450,0,20870));
         SERVER_MAP.putIfAbsent(20890,new RobinLb(600,0,20890));
-    }*//*
+    }*/
 
 
     public void set(Integer weight,Integer port){
@@ -37,7 +35,7 @@ public class RobinLb {
             entry.getValue().setCurWeight(0);
         }
     }
-    public void fail(Integer port){
+    /*public void fail(Integer port){
         Iterator<Map.Entry<Integer,RobinLb>> iterator = SERVER_MAP.entrySet().iterator();
         RobinLb tempRobinLb = null;
         int maxWeight=Integer.MIN_VALUE;
@@ -68,7 +66,7 @@ public class RobinLb {
                 }
             }
         }
-    }
+    }*/
 
 
     public static RobinLb getRobinLb(Integer port){
@@ -118,7 +116,6 @@ public class RobinLb {
                 robinLb.setCurWeight(robinLb.getWeight().get()+curTempWeight);
                 robinLb.lastWeight.set(robinLb.getWeight().get()+curTempWeight);
             }
-
         }
         return maxWeightRobinLb.getPort().get();
 //        System.out.println(maxWeightRobinLb);
@@ -163,4 +160,3 @@ public class RobinLb {
                 '}';
     }
 }
-*/
