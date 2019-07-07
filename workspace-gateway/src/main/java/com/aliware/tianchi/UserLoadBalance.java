@@ -19,7 +19,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 选手需要基于此类实现自己的负载均衡算法
  */
 public class UserLoadBalance implements LoadBalance {
-    private static volatile AtomicInteger value=new AtomicInteger(1);
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
         Invoker<T> invoker =  smoothSelect(invokers);
@@ -30,7 +29,8 @@ public class UserLoadBalance implements LoadBalance {
     private <T> Invoker<T> smoothSelect(List<Invoker<T>> invokers) {
         int max=Integer.MIN_VALUE;
         Invoker<T> maxInvoker= null;
-        for(Invoker<T> invoker : invokers){
+        for(int i=invokers.size()-1;i>=0;i--){
+            Invoker<T> invoker = invokers.get(i);
             URL invokerUrl= invoker.getUrl();
             ClientStatus clientStatus = ClientStatus.getStatus(invokerUrl.getIp(),invokerUrl.getPort());
             int free = clientStatus.maxThread.get()-clientStatus.activeCount.get();
