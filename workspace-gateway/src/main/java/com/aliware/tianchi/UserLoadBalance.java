@@ -22,11 +22,27 @@ public class UserLoadBalance implements LoadBalance {
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
         Invoker<T> invoker =  smoothSelect(invokers);
+//        System.out.println("invoker = [" + invoker + "]");
         return invoker;
     }
 
     private <T> Invoker<T> smoothSelect(List<Invoker<T>> invokers) {
-        if(isInit || invokers.size()== RobinLb.getServerMap().size()){
+        int max=Integer.MIN_VALUE;
+        Invoker<T> maxInvoker= null;
+        for(Invoker<T> invoker : invokers){
+            URL invokerUrl= invoker.getUrl();
+            ClientStatus clientStatus = ClientStatus.getStatus(invokerUrl.getIp(),invokerUrl.getPort());
+            int free = clientStatus.maxThread.get()-clientStatus.activeCount.get();
+            if(free>1){
+                return invoker;
+            }
+            if(max<free){
+                max=free;
+                maxInvoker=invoker;
+            }
+        }
+        return maxInvoker==null?invokers.get(ThreadLocalRandom.current().nextInt(invokers.size())):maxInvoker;
+        /*if(isInit || invokers.size()== RobinLb.getServerMap().size()){
             isInit=true;
             Integer port = RobinLb.getServer();
             for(Invoker<T> invoker : invokers){
@@ -34,7 +50,7 @@ public class UserLoadBalance implements LoadBalance {
                     return invoker;
                 }
             }
-        }
-        return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
+        }*/
+//        return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
     }
 }

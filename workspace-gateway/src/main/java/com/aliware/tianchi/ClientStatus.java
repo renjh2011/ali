@@ -1,4 +1,3 @@
-/*
 package com.aliware.tianchi;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,20 +8,23 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ClientStatus {
     private static final ConcurrentMap<String, ClientStatus> SERVICE_STATISTICS = new ConcurrentHashMap<>();
 
-    final AtomicInteger failed = new AtomicInteger(0);
     final AtomicInteger activeCount = new AtomicInteger(0);
     final AtomicLong requestCount = new AtomicLong(0);
-    final AtomicLong responseCount = new AtomicLong(0);
-    final AtomicLong failedTime = new AtomicLong();
-//    final AtomicLong lastFailedTime = new AtomicLong();
+//    final AtomicLong responseCount = new AtomicLong(0);
+    final AtomicInteger maxThread = new AtomicInteger(Integer.MAX_VALUE);
     private ClientStatus(){
 
     }
 
-    public static void requestCount(String ip,int port) {
+    public static ClientStatus requestCount(String ip,int port,boolean success) {
         ClientStatus clientStatus = getStatus(ip,port);
-        clientStatus.activeCount.incrementAndGet();
         clientStatus.requestCount.incrementAndGet();
+        if(success) {
+            clientStatus.activeCount.incrementAndGet();
+        }else {
+            clientStatus.activeCount.decrementAndGet();
+        }
+        return clientStatus;
     }
 
     public static ClientStatus getStatus(String ip,int port) {
@@ -35,29 +37,24 @@ public class ClientStatus {
         return status;
     }
 
-    public static void responseCount(String ip,int port,boolean fail) {
+    public static ClientStatus responseCount(String ip,int port,boolean fail) {
         ClientStatus clientStatus = getStatus(ip,port);
         if(fail){
             clientStatus.activeCount.decrementAndGet();
-            clientStatus.responseCount.incrementAndGet();
-            clientStatus.failed.incrementAndGet();
-//            clientStatus.lastFailedTime.set(clientStatus.failedTime.get());
-            clientStatus.failedTime.set(System.currentTimeMillis());
+//            clientStatus.responseCount.incrementAndGet();
         }else {
             clientStatus.activeCount.decrementAndGet();
-            clientStatus.responseCount.incrementAndGet();
+//            clientStatus.responseCount.incrementAndGet();
         }
-
+        return clientStatus;
     }
 
     @Override
     public String toString() {
         return "ClientStatus{" +
-                "failed=" + failed.get() +
                 ", activeCount=" + activeCount.get() +
                 ", requestCount=" + requestCount.get() +
-                ", responseCount=" + responseCount.get() +
+//                ", responseCount=" + responseCount.get() +
                 '}';
     }
 }
-*/

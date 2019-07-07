@@ -4,6 +4,10 @@ import org.apache.dubbo.common.Constants;
 import org.apache.dubbo.common.extension.Activate;
 import org.apache.dubbo.rpc.*;
 
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * @author daofeng.xjf
  *
@@ -13,36 +17,55 @@ import org.apache.dubbo.rpc.*;
  */
 @Activate(group = Constants.CONSUMER)
 public class TestClientFilter implements Filter {
+    private static final Lock lock = new ReentrantLock();		//由于需要锁定的sequence是类成员，创建一个static锁，保证该类不同线程实例能够感知到signalAll()
+    private static final Condition condition = lock.newCondition();
+
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
-//        String ip = invoker.getUrl().getIp();
-//        int port = invoker.getUrl().getPort();
-//        ClientStatus.requestCount(ip,port);
-        try{
-            Result result = invoker.invoke(invocation);
-            return result;
-        }catch (Exception e){
-            throw e;
+        String ip = invoker.getUrl().getIp();
+        int port = invoker.getUrl().getPort();
+        ClientStatus clientStatus = ClientStatus.requestCount(ip,port,true);
+//        ClientStatus clientStatus = ClientStatus.getStatus(ip,port);
+        if(clientStatus.activeCount.get()>clientStatus.maxThread.get()){
+            ClientStatus.requestCount(ip, port,false);
+            return null;
         }
+        return invoker.invoke(invocation);
+//        return result;
     }
 
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
-        boolean isSuccess = true;
         String ip = invoker.getUrl().getIp();
         int port = invoker.getUrl().getPort();
-        if(!result.hasException() && RobinLb.getServerMap().get(port)==null){
-            String maxThreadPool = result.getAttachment(port+"");
-            RobinLb.getRobinLb(port).set(Integer.parseInt(maxThreadPool),port);
-        }
-        if(result.hasException()){
-//            if((System.currentTimeMillis()-ClientStatus.getStatus(ip,port).failedTime.get())<200) {
-                RobinLb robinLb = RobinLb.getRobinLb(port);
-                robinLb.fail(port);
-//            }
+        boolean isSuccess = true;
+        if (!result.hasException()){
             isSuccess=false;
+            ClientStatus clientStatus = ClientStatus.getStatus(ip, port);
+            if(clientStatus.getStatus(ip, port).maxThread.get()==Integer.MAX_VALUE){
+                String maxThreadPool = result.getAttachment(port + "");
+                int max = Integer.parseInt(maxThreadPool);
+                ClientStatus.getStatus(ip, port).maxThread.set(max);
+            }
         }
-//        ClientStatus.responseCount(ip,port, !isSuccess);
+        ClientStatus.responseCount(ip, port, !isSuccess);
         return result;
     }
+
+    /*public void test(){
+        if (!result.hasException() && RobinLb.getServerMap().get(port) == null) {
+            String maxThreadPool = result.getAttachment(port + "");
+            RobinLb robinLb = RobinLb.getRobinLb(port);
+            int max = Integer.parseInt(maxThreadPool);
+            robinLb.set(max, port);
+            ClientStatus.getStatus(ip, port).maxThread.set(max);
+        }
+        if (result.hasException()) {
+            isSuccess = false;
+            RobinLb robinLb = RobinLb.getRobinLb(port);
+            robinLb.fail(port);
+//            }
+
+        }
+    }*/
 }
