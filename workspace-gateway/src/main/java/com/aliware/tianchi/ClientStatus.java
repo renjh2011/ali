@@ -11,7 +11,7 @@ public class ClientStatus {
     final AtomicInteger activeCount = new AtomicInteger(0);
     final AtomicLong requestCount = new AtomicLong(0);
 //    final AtomicLong responseCount = new AtomicLong(0);
-    final AtomicInteger maxThread = new AtomicInteger(Integer.MAX_VALUE);
+    final AtomicInteger maxThread = new AtomicInteger(Integer.MAX_VALUE-200);
     private ClientStatus(){
 
     }

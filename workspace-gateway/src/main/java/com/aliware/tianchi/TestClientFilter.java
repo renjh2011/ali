@@ -4,10 +4,6 @@ import org.apache.dubbo.common.Constants;
 import org.apache.dubbo.common.extension.Activate;
 import org.apache.dubbo.rpc.*;
 
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 /**
  * @author daofeng.xjf
  *
@@ -17,8 +13,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @Activate(group = Constants.CONSUMER)
 public class TestClientFilter implements Filter {
-    private static final Lock lock = new ReentrantLock();		//由于需要锁定的sequence是类成员，创建一个static锁，保证该类不同线程实例能够感知到signalAll()
-    private static final Condition condition = lock.newCondition();
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
@@ -26,7 +20,7 @@ public class TestClientFilter implements Filter {
         int port = invoker.getUrl().getPort();
         ClientStatus clientStatus = ClientStatus.requestCount(ip,port,true);
 //        ClientStatus clientStatus = ClientStatus.getStatus(ip,port);
-        if(clientStatus.activeCount.get()>clientStatus.maxThread.get()){
+        if(clientStatus.activeCount.get()>clientStatus.maxThread.get()+2){
             ClientStatus.requestCount(ip, port,false);
             return null;
         }
@@ -40,13 +34,14 @@ public class TestClientFilter implements Filter {
         int port = invoker.getUrl().getPort();
         boolean isSuccess = true;
         if (!result.hasException()){
-            isSuccess=false;
             ClientStatus clientStatus = ClientStatus.getStatus(ip, port);
-            if(clientStatus.getStatus(ip, port).maxThread.get()==Integer.MAX_VALUE){
+            if(clientStatus.getStatus(ip, port).maxThread.get()==(Integer.MAX_VALUE-200)){
                 String maxThreadPool = result.getAttachment(port + "");
                 int max = Integer.parseInt(maxThreadPool);
                 ClientStatus.getStatus(ip, port).maxThread.set(max);
             }
+        }else {
+            isSuccess=false;
         }
         ClientStatus.responseCount(ip, port, !isSuccess);
         return result;
