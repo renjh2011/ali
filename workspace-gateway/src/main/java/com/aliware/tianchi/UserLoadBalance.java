@@ -19,18 +19,27 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 选手需要基于此类实现自己的负载均衡算法
  */
 public class UserLoadBalance implements LoadBalance {
+    private final static AtomicInteger sequence = new AtomicInteger(1);
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
         Invoker<T> invoker =  smoothSelect(invokers);
-//        System.out.println("invoker = [" + invoker + "]");
         return invoker;
     }
 
     private <T> Invoker<T> smoothSelect(List<Invoker<T>> invokers) {
+        int size = invokers.size();
+        int j;
+        synchronized (sequence) {
+            if (size == sequence.get()) {
+                j=sequence.getAndSet(1);
+            } else {
+                j=sequence.getAndIncrement();
+            }
+        }
         int max=Integer.MIN_VALUE;
         Invoker<T> maxInvoker= null;
         for(int i=invokers.size()-1;i>=0;i--){
-            Invoker<T> invoker = invokers.get(i);
+            Invoker<T> invoker = invokers.get(j-1);
             URL invokerUrl= invoker.getUrl();
             ClientStatus clientStatus = ClientStatus.getStatus(invokerUrl.getIp(),invokerUrl.getPort());
             int free = clientStatus.maxThread.get()-clientStatus.activeCount.get();
@@ -40,6 +49,11 @@ public class UserLoadBalance implements LoadBalance {
             if(max<free){
                 max=free;
                 maxInvoker=invoker;
+            }
+            if(j==size){
+                j=1;
+            }else {
+                j++;
             }
         }
         return maxInvoker==null?invokers.get(ThreadLocalRandom.current().nextInt(invokers.size())):maxInvoker;
